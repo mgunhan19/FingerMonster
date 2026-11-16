@@ -55,3 +55,12 @@ Bu belge, FingerMonster projesinde çalışacak tüm yapay zeka ajanları ve alt
 - **İnfaz Sekansı (ExecutionReflectionSystem)**: Oda kararır, seyirciler kasabı doğrudan göremez; silüet ve yansıma daktilo silindirinde parlar.
 - **El Kopma Mekaniği (HandSeverSystem & SeveredHandPhysics)**: Kopan el kemiklerinin ölçeği sıfır (`0`) yapılmaz; transform bozulmasını ve NaN hatalarını önlemek için minimum `0.0001f` değerine çekilir.
 
+## 9. Dosya Yerleşim Kuralları
+- **Yeni Dosyaların Konumu ve Adlandırma**: Yeni oluşturulan her dosya `Assets/_Project/` altındaki ilgili klasöre konur:
+  - Script'ler görevine göre ilgili `Assets/_Project/Scripts/<Sistem>/` altına yerleştirilir.
+  - Yeni materyaller `M_Ad` (veya mevcut `Mat_Ad` standardıyla uyumlu) ve `Assets/_Project/Art/Materials/` altına, dokular `T_Ad` ve `Assets/_Project/Art/Textures/` altına, prefab'lar `Ad` ve `Assets/_Project/Prefabs/` altına, animasyon klipleri `Ad_Eylem` ve `Assets/_Project/Animation/Clips/` altına, sesler `SFX_Olay_01` ve `Assets/_Project/Audio/` altına, ScriptableObject'ler `Ad_Data` ve `Assets/_Project/ScriptableObjects/` altına yerleştirilir.
+- **Harita Güncelleme Zorunluluğu**: Yeni ana klasör açmadan önce `PROJE_HARITASI.md` güncellenir; projeye yeni bir sistem eklendiğinde `PROJE_HARITASI.md` güncellenir.
+- **Üçüncü Taraf Paketler**: Üçüncü taraf varlık paketleri `Assets/ThirdParty/` altına konur ve iç klasör yapısına dokunulmaz.
+- **Arşivleme Kuralı**: Geçici, kopya ve kullanılmayan dosyalar silinmez; `Assets/_Archive/` altına taşınır ve `Assets/_Project/Docs/ArsivListesi.md` güncellenir.
+
+
