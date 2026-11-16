@@ -1,0 +1,23 @@
+MIXAMO IMPORT & REMAP RAPORU (2026-11-12 16:37:28)
+İşlenen FBX sayısı: 9
+------------------------------------------------------------
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feg/Emote5_Feg.fbx' bulunamadı -> Yedek Mixamo klibi 'Crazy Gesture.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feg/Emote4_Feg.fbx' bulunamadı -> Yedek Mixamo klibi 'Sitting Clap.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feg/Emote3_Feg.fbx' bulunamadı -> Yedek Mixamo klibi 'Pointing.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feg/Emote2_Feg.fbx' bulunamadı -> Yedek Mixamo klibi 'Taunt Gesture.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feg/Emote1_Feg.fbx' bulunamadı -> Yedek Mixamo klibi 'Sitting Laughing.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Kenan/Emote5_Kenan.fbx' bulunamadı -> Yedek Mixamo klibi 'Pointing.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Kenan/Emote4_Kenan.fbx' bulunamadı -> Yedek Mixamo klibi 'Crazy Gesture.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Kenan/Emote3_Kenan.fbx' bulunamadı -> Yedek Mixamo klibi 'Sitting Disapproval.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Kenan/Emote2_Kenan.fbx' bulunamadı -> Yedek Mixamo klibi 'Looking.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Kenan/Emote1_Kenan.fbx' bulunamadı -> Yedek Mixamo klibi 'Crying.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feyzi/Emote5_Feyzi.fbx' bulunamadı -> Yedek Mixamo klibi 'Sitting Laughing.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feyzi/Emote4_Feyzi.fbx' bulunamadı -> Yedek Mixamo klibi 'Taunt Gesture.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feyzi/Emote3_Feyzi.fbx' bulunamadı -> Yedek Mixamo klibi 'Pointing.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feyzi/Emote2_Feyzi.fbx' bulunamadı -> Yedek Mixamo klibi 'Sitting Disapproval.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/Feyzi/Emote1_Feyzi.fbx' bulunamadı -> Yedek Mixamo klibi 'Sitting Clap.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/MMG/Emote5_MMG.fbx' bulunamadı -> Yedek Mixamo klibi 'Pointing.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/MMG/Emote4_MMG.fbx' bulunamadı -> Yedek Mixamo klibi 'Taunt Gesture.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/MMG/Emote3_MMG.fbx' bulunamadı -> Yedek Mixamo klibi 'Sitting Laughing.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/MMG/Emote2_MMG.fbx' bulunamadı -> Yedek Mixamo klibi 'Sitting Clap.fbx' kullanıldı.
+[EKSİK] 'Assets/Characters/Animations/Mixamo/MMG/Emote1_MMG.fbx' bulunamadı -> Yedek Mixamo klibi 'Crazy Gesture.fbx' kullanıldı.

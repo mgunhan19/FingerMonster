@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using FingerMonster.Core;
+using FingerMonster.Data;
 
 namespace FingerMonster.Gameplay
 {
@@ -86,6 +88,29 @@ namespace FingerMonster.Gameplay
                         StrikeAngle = new Vector3(45f, 0, 0)
                     };
             }
+        }
+
+        /// <summary>
+        /// GameSettings üzerinden veya çalışma zamanı varsayılanlarından WeaponData örneğini döndürür.
+        /// </summary>
+        public static WeaponData GetWeaponData(ExecutionWeaponType type)
+        {
+            if (GameManager.Instance != null && GameManager.Instance.Settings != null)
+            {
+                var weapons = GameManager.Instance.Settings.butcherWeapons;
+                if (weapons != null)
+                {
+                    for (int i = 0; i < weapons.Count; i++)
+                    {
+                        if (weapons[i] != null && weapons[i].weaponType == type)
+                        {
+                            return weapons[i];
+                        }
+                    }
+                }
+            }
+
+            return WeaponData.CreateRuntimeDefault(type);
         }
     }
 }

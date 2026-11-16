@@ -5,6 +5,8 @@ using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using FingerMonster.AI;
+using FingerMonster.Core;
+using FingerMonster.Player;
 
 namespace FingerMonster.Networking
 {
@@ -38,7 +40,7 @@ namespace FingerMonster.Networking
         {
             if (Instance != null && Instance != this)
             {
-                Destroy(gameObject);
+                DestroyImmediate(gameObject);
                 return;
             }
             Instance = this;
@@ -137,6 +139,11 @@ namespace FingerMonster.Networking
             }
 
             OnLeftLobby?.Invoke();
+
+            if (SceneManager.GetActiveScene().name != "MainMenu")
+            {
+                SceneManager.LoadScene("MainMenu");
+            }
         }
 
         private void SetTransportConnection(string ip, ushort port)
@@ -195,10 +202,12 @@ namespace FingerMonster.Networking
             for (int i = 0; i < connectedClients.Count && i < 4; i++)
             {
                 ulong cId = connectedClients[i].ClientId;
-                string pName = (cId == NetworkManager.Singleton.LocalClientId) ? LocalPlayerName : $"Oyuncu {i + 1}";
-                Color pColor = GetSeatColor(i);
+                CharacterArchetype arch = GameSessionData.GetSeatArchetype(i);
+                CharacterDefinition def = CharacterDefinition.GetDefinition(arch);
+                string baseName = (cId == NetworkManager.Singleton.LocalClientId) ? LocalPlayerName : $"Oyuncu {i + 1}";
+                string pName = $"{def.DisplayName} ({baseName} - {def.PersonalityTag})";
 
-                slots.Add(new NetworkPlayerSlot(cId, i, pName, isBot: false, pColor));
+                slots.Add(new NetworkPlayerSlot(cId, i, pName, isBot: false, def.PrimaryColor, (int)arch));
             }
 
             // 2. Boş koltukları Botlarla doldur (Eğer açık ise)
@@ -206,8 +215,9 @@ namespace FingerMonster.Networking
             {
                 for (int i = slots.Count; i < 4; i++)
                 {
-                    BotProfile botProf = BotProfile.GenerateRandom(i);
-                    slots.Add(new NetworkPlayerSlot(ulong.MaxValue - (ulong)i, i, botProf.BotName, isBot: true, GetSeatColor(i)));
+                    CharacterArchetype arch = GameSessionData.GetSeatArchetype(i);
+                    BotProfile botProf = BotProfile.ForCharacterSlot(i, arch);
+                    slots.Add(new NetworkPlayerSlot(ulong.MaxValue - (ulong)i, i, $"{botProf.BotName} [Bot]", isBot: true, botProf.AvatarColor, (int)arch));
                 }
             }
 

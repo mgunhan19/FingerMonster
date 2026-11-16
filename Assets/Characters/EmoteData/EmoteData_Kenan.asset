@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82941efa032df5c4bb4ff98c42078530, type: 3}
+  m_Name: EmoteData_Kenan
+  m_EditorClassIdentifier: Assembly-CSharp::FingerMonster.Player.CharacterEmoteData
+  Archetype: 1
+  CharacterName: Kenan
+  PersonalityTag: "\xDCrkek"
+  Slots:
+  - SlotNumber: 1
+    DisplayName: "Sahte A\u011Flama"
+    PopupText: "\xDCH\xDC \xDCH\xDC!"
+    PopupColor: {r: 0.45, g: 0.75, b: 1, a: 1}
+    ExpectedMixamoFile: Emote1_Kenan.fbx
+    RecommendedMixamoSearch: Crying / Sad Idle
+    Description: "Ellerini y\xFCz\xFCne kapat\u0131p panikle a\u011Flar."
+  - SlotNumber: 2
+    DisplayName: "Panik Bak\u0131\u015F"
+    PopupText: "K\u0130MSE VAR MI?!"
+    PopupColor: {r: 0, g: 1, b: 1, a: 1}
+    ExpectedMixamoFile: Emote2_Kenan.fbx
+    RecommendedMixamoSearch: Looking / Terrified
+    Description: "Etraf\u0131na korkuyla g\xF6z gezdirir."
+  - SlotNumber: 3
+    DisplayName: Korkuyla Reddet
+    PopupText: YAPMA NOLUR!
+    PopupColor: {r: 0.75, g: 0.85, b: 1, a: 1}
+    ExpectedMixamoFile: Emote3_Kenan.fbx
+    RecommendedMixamoSearch: Sitting Disapproval / Shaking Head No
+    Description: "Ba\u015F\u0131n\u0131 sallayarak tuza\u011F\u0131 reddeder."
+  - SlotNumber: 4
+    DisplayName: Sinir Krizi
+    PopupText: "AKLIM G\u0130TT\u0130!"
+    PopupColor: {r: 1, g: 0.8, b: 0.3, a: 1}
+    ExpectedMixamoFile: Emote4_Kenan.fbx
+    RecommendedMixamoSearch: Crazy Gesture / Nervous
+    Description: "Stresten \xE7\u0131lg\u0131na d\xF6nm\xFC\u015F gibi titrer."
+  - SlotNumber: 5
+    DisplayName: "Su\xE7lama Parma\u011F\u0131"
+    PopupText: O YAPTI!
+    PopupColor: {r: 0.35, g: 0.65, b: 1, a: 1}
+    ExpectedMixamoFile: Emote5_Kenan.fbx
+    RecommendedMixamoSearch: Pointing / Blaming
+    Description: "Panikle hedef rakibi i\u015Faret eder."

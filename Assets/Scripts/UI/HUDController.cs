@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using FingerMonster.Player;
 using FingerMonster.Core;
@@ -29,6 +30,23 @@ namespace FingerMonster.UI
 
         public void SetupHUD(IReadOnlyList<PlayerData> players)
         {
+            CanvasScaler scaler = GetComponentInParent<CanvasScaler>();
+            if (scaler == null)
+            {
+                Canvas parentCanvas = GetComponentInParent<Canvas>();
+                if (parentCanvas != null)
+                {
+                    scaler = parentCanvas.GetComponent<CanvasScaler>();
+                }
+            }
+            if (scaler != null)
+            {
+                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                scaler.referenceResolution = new Vector2(1920f, 1080f);
+                scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+                scaler.matchWidthOrHeight = 0.5f;
+            }
+
             for (int i = 0; i < playerCards.Count && i < players.Count; i++)
             {
                 playerCards[i].Initialize(players[i]);
@@ -38,6 +56,21 @@ namespace FingerMonster.UI
             {
                 bannerRoot.SetActive(false);
             }
+
+            AbilityCardHUD abilityHud = FindFirstObjectByType<AbilityCardHUD>();
+            if (abilityHud == null)
+            {
+                abilityHud = gameObject.AddComponent<AbilityCardHUD>();
+            }
+            abilityHud.EnsureInitialized();
+            abilityHud.RefreshDisplay();
+
+            GhostHUD ghostHud = FindFirstObjectByType<GhostHUD>();
+            if (ghostHud == null)
+            {
+                ghostHud = gameObject.AddComponent<GhostHUD>();
+            }
+            ghostHud.EnsureInitialized();
         }
 
         public void UpdateRoundInfo(int roundNumber, int remainingSafeKeys)
@@ -49,7 +82,15 @@ namespace FingerMonster.UI
 
             if (remainingSafeKeysText != null)
             {
-                remainingSafeKeysText.text = $"Kalan Güvenli Tuş: {remainingSafeKeys}";
+                remainingSafeKeysText.text = $"Kalan: {remainingSafeKeys}";
+            }
+        }
+
+        public void SetPromptText(string text)
+        {
+            if (activePlayerPromptText != null)
+            {
+                activePlayerPromptText.text = text;
             }
         }
 

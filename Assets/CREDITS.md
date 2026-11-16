@@ -1,46 +1,44 @@
-# FingerMonster - Third Party Credits & Asset Attributions
+# FingerMonster Ses ve Varlık Kaynakları (CREDITS)
 
-Tüm asset ve kütüphane kaynakları telifsiz / ticari kullanıma uygun (CC0 / MIT / Standard Free License) prensibiyle listelenmiştir.
+## Geçici Prosedürel Yer Tutucu Sesler (CC0 / Proje İçi Üretim)
 
-## Sesler (Audio)
-- **Prosedürel SFX & Müzik Sentezleyici (Built-in Audio Synthesizer)**:
-  - Harici dosya bağımlılığı olmadan %100 taşınabilir, gecikmesiz ve hatasız çalışması için Unity `AudioClip.Create` yöntemiyle gerçek zamanlı sentezlenmiş:
-    - Mekanik daktilo tuş vuruşu (mechanical click)
-    - Satır sonu zili (carriage return ding)
-    - Tuzak kapanma ve el kopma stinger sesi
-    - Kasap gerilim tonu (butcher stinger)
-    - 4 Absürt Silah Sesi: Dev Et Tokmağı ("BOONNNK!"), Tava ("DÖNNNKKK!"), Sosis Kırbacı ("ŞŞŞRAAAK!"), Pasta ("SSSPLLLAATTT!")
-    - Kasap komik kıkırdaması (pitch-modulated butcher giggle)
-    - Çizgi film gerilim pizzicato döngüsü (cartoon suspense loop)
-    - Seyirciler için boğuk infaz yansıma filtresi (low-pass audio filter)
-  - Kod: `SoundEffectsGenerator.cs`, `AudioManager.cs`
+Otomatik tarayıcı oturumu/telif doğrulaması olmadan doğrudan harici CC0 ses dosyaları indirilemediği için aşağıdaki dosyalar **geçici** olarak `44.1 kHz, 16-bit Mono PCM (.wav)` formatında prosedürel sentez ile üretilmiştir. Üretim aşamasında aşağıdaki adımları izleyerek gerçek CC0 ses dosyaları ile değiştirebilirsiniz.
 
-## Görsel Efektler ve Partiküller (Visual FX)
-- **Stilize Çizgi Roman / Çizgi Film Efekt Motoru (Cartoon FX Engine)**:
-  - Gerçekçi kan/vahşet yerine karanlık komedi tonuna uygun sansürlü puf duman bulutu, dönen çizgi film yıldızları, konfetiler, kamera sarsıntısı ve zıplayan 3D çizgi roman baloncukları (`GÜVENLİ!`, `ÇAAATT!`, `POW! ELENDİ!`).
-  - Kopan el çizgi film fiziği (`SeveredHandPhysics`) ve yerde 5 saniye komik seğirme animasyonu.
-  - Zifiri karanlık & daktilo silindirinde silüet yansıma efekti (`ExecutionReflectionSystem`).
-  - Kod: `CartoonFXManager.cs`, `ExecutionReflectionSystem.cs`, `SeveredHandPhysics.cs`
+### Hayalet Sesleri (`Assets/Audio/Ghost/`)
+| Dosya | Durum | Açıklama | Süre |
+| :--- | :--- | :--- | :--- |
+| `ghost_buuu_scare.wav` | **geçici** | Hayalet korkutma ("BUUU") sesi | ~0.85s |
+| `ghost_throw_whoosh.wav` | **geçici** | Nesne fırlatma rüzgar/whoosh sesi | ~0.30s |
+| `ghost_pie_splat.wav` | **geçici** | Kremalı pasta çarpma/splat sesi | ~0.38s |
+| `ghost_tomato_splat.wav` | **geçici** | Domates ezilme/splat sesi | ~0.32s |
+| `ghost_paper_hit.wav` | **geçici** | Kağıt topu çarpma/hışırtı sesi | ~0.22s |
+| `ghost_sausage_bonk.wav` | **geçici** | Sosis lastiksi bonk sesi | ~0.28s |
 
-## Karakterler ve Animasyon (Characters & Procedural Rigs)
-- **4 Çizgi Film Karakter Arketipi**:
-  - `Kabadayı` (Geniş omuzlu, ağırbaşlı, kırmızı kasketli)
-  - `Korkak` (Uzun, ince, titrek, mavi silindir şapkalı)
-  - `Sinsi` (Hafif eğik, yeşil kukuletalı, hızlı göz kırpan)
-  - `Şovmen` (Kibar, altın papyonlu, teatral jestli)
-- **Prosedürel İskelet Sürücüsü (CharacterAnimatorDriver)**:
-  - Nefes alma (breathing), göz kırpma (blinking), düşünme (head tilt), 2 elle tuşa basma, tek elle basma ve kafa atma ("DÖNK!").
-  - 16+ Senkronize Karakter Emote Hareketi (alay dansı, göğüs yumruklama, sahte ağlama, maymun taklidi, vb.).
-  - 4 Silaha özel elenme animasyonu (yassılma, sersemlik yıldızları, 720° fırıldak dönüşü, kayıp düşme).
-  - Kod: `CharacterDefinition.cs`, `CharacterAnimatorDriver.cs`, `PlayerVisualAvatar.cs`, `EmoteWheelUI.cs`
+### Kasap Silah Sesleri (`Assets/Audio/Butcher/`)
+| Dosya | Durum | Açıklama | Süre |
+| :--- | :--- | :--- | :--- |
+| `butcher_mallet_hit.wav` | **geçici** | Dev et çekici darbe sesi | ~0.42s |
+| `butcher_pan_clang.wav` | **geçici** | Döküm tava metalik çınlama ("DÖNKK") | ~0.65s |
+| `butcher_whip_snap.wav` | **geçici** | Sosis kırbacı şaklama ("ŞRAAK") | ~0.28s |
+| `butcher_pie_splat.wav` | **geçici** | Kremalı pasta fırlatıcı patlama/splat | ~0.45s |
 
-## Ağ Altyapısı ve Kütüphaneler (Networking)
-- **Unity Netcode for GameObjects (v2.2.0)**: Unity Technologies (Unity Companion License / Apache-2.0) - Sunucu yetkili (Server-Authoritative) ağ senkronizasyonu, RPC mekanizmaları ve NetworkVariable yönetimi.
-- **Unity Transport (v2.4.0)**: Unity Technologies - Düşük gecikmeli UDP tabanlı ağ taşıma katmanı.
-- **LAN Discovery**: Yerel ağda otomatik oda bulma (UDP broadcast port 47777).
-- **Mono.Cecil (v1.11.4)**: Jb Evain (MIT License) - Netcode IL post-processing bağımlılığı.
+---
 
-## Font ve Görsel Kaynaklar
-- **Unity UI / TextMeshPro**: Unity Technologies (UGUI & TextMeshPro vektörel SDF fontları ve UI bileşenleri).
-- **Unity Universal Render Pipeline (URP)**: Unity Technologies.
-- **Kenney.nl / Poly Pizza**: İlerleyen aşamalar için planlanan ticari kullanıma uygun CC0/MIT varlık referansları.
+## Gerçek CC0 Seslerle Değiştirme Adımları (Kullanıcı Rehberi)
+
+1. **OpenGameArt.org üzerinden arama (Giriş gerektirmez):**
+   - `https://opengameart.org/art-search-advanced` adresine gidin.
+   - **Art Type** olarak `Sound Effect`, **Licenses** olarak yalnızca `CC0` kutucuğunu işaretleyin.
+   - Önerilen arama terimleri ve paketler:
+     - Fırlatma/Whoosh için: `"Swishes sound pack"` veya `whoosh`
+     - Splat/Pasta/Domates için: `"Squish Sound Effects"` veya `splat` / `squish`
+     - Tokmak/Tava/Kırbaç için: `"37 hits/punches"`, `"100 CC0 Metal and Wood SFX"` veya `pan clang`, `whip crack`, `cartoon bonk`
+     - Hayalet "Buuu" için: `ghost boo`, `cartoon ghost`, `monster`
+2. **Freesound.org üzerinden arama (Ücretsiz hesap girişi gerekir):**
+   - `https://freesound.org/` adresine giriş yapın.
+   - Arama çubuğuna ilgili efekti yazın (ör. `pie splat`, `frying pan hit`, `whip crack`, `ghost boo`).
+   - Sağdaki **Licenses** filtresinden yalnızca **Creative Commons 0 (CC0)** seçeneğini aktif edin.
+   - `.wav` formatındaki dosyaları indirin.
+3. **Dosyaları Yerleştirme:**
+   - İndirdiğiniz `.wav` (veya `.ogg`) dosyalarını yukarıdaki tablolarda belirtilen **aynı dosya adlarıyla** `Assets/Audio/Ghost/` ve `Assets/Audio/Butcher/` klasörlerinin üzerine yazın.
+   - Unity Editör'e döndüğünüzde `AudioManager` veya ilgili Inspector referanslarını kontrol edin; yeni seslerin lisans/yazar/URL bilgilerini bu `Assets/CREDITS.md` dosyasına ekleyin.

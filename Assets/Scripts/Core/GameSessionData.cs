@@ -1,8 +1,11 @@
+using UnityEngine;
+using FingerMonster.Player;
+
 namespace FingerMonster.Core
 {
     /// <summary>
-    /// Ana Menü ile Game sahnesi arasında seçilen oyun modu, zorluk derecesi ve
-    /// bot/insan yapılandırmasını taşıyan statik oturum verisi.
+    /// Ana Menü ile Game sahnesi arasında seçilen oyun modu, zorluk derecesi,
+    /// seçili karakter ve bot/insan yapılandırmasını taşıyan statik oturum verisi.
     /// </summary>
     public static class GameSessionData
     {
@@ -21,6 +24,9 @@ namespace FingerMonster.Core
 
         public static GameMode SelectedMode = GameMode.SoloVsBots;
         public static Difficulty SelectedDifficulty = Difficulty.Normal;
+
+        // Oyuncunun Ana Menüde seçtiği karakter (varsayılan 0 = Feg)
+        public static int SelectedCharacterIndex = 0;
 
         // Her koltuğun bot olup olmadığı
         private static bool[] botSlots = new bool[4] { false, true, true, true };
@@ -44,6 +50,33 @@ namespace FingerMonster.Core
                 botSlots[2] = false;
                 botSlots[3] = false;
             }
+        }
+
+        public static void SetSelectedCharacter(int index)
+        {
+            SelectedCharacterIndex = Mathf.Clamp(index, 0, 3);
+        }
+
+        /// <summary>
+        /// Verilen koltuğa hangi karakter arketipinin oturacağını döner.
+        /// Koltuk 0 (ön koltuk) seçili karakteri alır; diğer koltuklar kalan 3 karakteri sırayla alır.
+        /// </summary>
+        public static CharacterArchetype GetSeatArchetype(int seatIndex)
+        {
+            int chosen = Mathf.Clamp(SelectedCharacterIndex, 0, 3);
+            if (seatIndex == 0) return (CharacterArchetype)chosen;
+
+            int order = 0;
+            for (int c = 0; c < 4; c++)
+            {
+                if (c == chosen) continue;
+                order++;
+                if (order == seatIndex)
+                {
+                    return (CharacterArchetype)c;
+                }
+            }
+            return (CharacterArchetype)(Mathf.Abs(seatIndex) % 4);
         }
 
         public static bool IsSlotBot(int index)

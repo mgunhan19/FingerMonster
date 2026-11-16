@@ -27,9 +27,25 @@ namespace FingerMonster.UI
         [Header("Kapat Butonu")]
         [SerializeField] private Button backButton;
 
+        [Header("Hayalet Ayarları")]
+        [SerializeField] private Toggle ghostEffectsToggle;
+        [SerializeField] private Toggle reduceGhostEffectsToggle;
+
         private const string PrefMaster = "FingerMonster_MasterVol";
         private const string PrefSfx = "FingerMonster_SfxVol";
         private const string PrefMusic = "FingerMonster_MusicVol";
+        private const string PrefGhostEffects = "FingerMonster_GhostEffects";
+        private const string PrefReduceGhostEffects = "FingerMonster_ReduceGhostEffects";
+
+        /// <summary>
+        /// Hayalet atmosferik etkilerinin ayarlar menüsünden etkin olup olmadığını döner.
+        /// </summary>
+        public static bool AreGhostEffectsEnabled() => PlayerPrefs.GetInt(PrefGhostEffects, 1) == 1;
+
+        /// <summary>
+        /// Hayalet etkilerinin azaltılmış (erişilebilirlik/sadeleştirilmiş) modda olup olmadığını döner.
+        /// </summary>
+        public static bool AreGhostEffectsReduced() => PlayerPrefs.GetInt(PrefReduceGhostEffects, 0) == 1;
 
         private void Awake()
         {
@@ -56,6 +72,9 @@ namespace FingerMonster.UI
                 musicVolumeSlider.onValueChanged.RemoveAllListeners();
                 musicVolumeSlider.onValueChanged.AddListener(OnMusicChanged);
             }
+
+            EnsureGhostEffectsToggle();
+            BindGhostEffectsToggle();
 
             LoadSavedPreferences();
         }
@@ -125,6 +144,9 @@ namespace FingerMonster.UI
                 musicVolumeSlider.SetValueWithoutNotify(bgm);
             }
 
+            EnsureGhostEffectsToggle();
+            BindGhostEffectsToggle();
+
             UpdateLabels(m, s, bgm);
         }
 
@@ -186,6 +208,155 @@ namespace FingerMonster.UI
                 AudioManager.Instance.SetSfxVolume(s);
                 AudioManager.Instance.SetMusicVolume(bgm);
             }
+
+            BindGhostEffectsToggle();
+        }
+
+        private void BindGhostEffectsToggle()
+        {
+            if (ghostEffectsToggle != null)
+            {
+                ghostEffectsToggle.onValueChanged.RemoveListener(OnGhostEffectsChanged);
+                ghostEffectsToggle.onValueChanged.AddListener(OnGhostEffectsChanged);
+                ghostEffectsToggle.SetIsOnWithoutNotify(AreGhostEffectsEnabled());
+            }
+
+            if (reduceGhostEffectsToggle != null)
+            {
+                reduceGhostEffectsToggle.onValueChanged.RemoveListener(OnReduceGhostEffectsChanged);
+                reduceGhostEffectsToggle.onValueChanged.AddListener(OnReduceGhostEffectsChanged);
+                reduceGhostEffectsToggle.SetIsOnWithoutNotify(AreGhostEffectsReduced());
+            }
+        }
+
+        private void OnGhostEffectsChanged(bool val)
+        {
+            PlayerPrefs.SetInt(PrefGhostEffects, val ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        private void OnReduceGhostEffectsChanged(bool val)
+        {
+            PlayerPrefs.SetInt(PrefReduceGhostEffects, val ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        private void EnsureGhostEffectsToggle()
+        {
+            if (settingsPanelRoot == null) return;
+
+            if (ghostEffectsToggle == null)
+            {
+                Vector2 baseAnchorMin = new Vector2(0.5f, 0.5f);
+                Vector2 baseAnchorMax = new Vector2(0.5f, 0.5f);
+                Vector2 basePivot = new Vector2(0.5f, 0.5f);
+                Vector2 basePos = new Vector2(0f, -120f);
+
+                if (musicVolumeSlider != null)
+                {
+                    RectTransform sliderRect = musicVolumeSlider.GetComponent<RectTransform>();
+                    if (sliderRect != null)
+                    {
+                        baseAnchorMin = sliderRect.anchorMin;
+                        baseAnchorMax = sliderRect.anchorMax;
+                        basePivot = sliderRect.pivot;
+                        basePos = sliderRect.anchoredPosition + new Vector2(0f, -55f);
+                    }
+                }
+
+                ghostEffectsToggle = CreateProceduralToggle(
+                    "GhostEffectsToggle",
+                    "Hayalet Etkileri",
+                    baseAnchorMin,
+                    baseAnchorMax,
+                    basePivot,
+                    basePos);
+            }
+
+            if (reduceGhostEffectsToggle == null)
+            {
+                RectTransform ghostRect = ghostEffectsToggle != null
+                    ? ghostEffectsToggle.GetComponent<RectTransform>()
+                    : null;
+
+                Vector2 anchorMin = ghostRect != null ? ghostRect.anchorMin : new Vector2(0.5f, 0.5f);
+                Vector2 anchorMax = ghostRect != null ? ghostRect.anchorMax : new Vector2(0.5f, 0.5f);
+                Vector2 pivot = ghostRect != null ? ghostRect.pivot : new Vector2(0.5f, 0.5f);
+                Vector2 pos = ghostRect != null
+                    ? ghostRect.anchoredPosition + new Vector2(0f, -44f)
+                    : new Vector2(0f, -164f);
+
+                reduceGhostEffectsToggle = CreateProceduralToggle(
+                    "ReduceGhostEffectsToggle",
+                    "Hayalet etkilerini azalt",
+                    anchorMin,
+                    anchorMax,
+                    pivot,
+                    pos);
+            }
+        }
+
+        private Toggle CreateProceduralToggle(
+            string objectName,
+            string labelText,
+            Vector2 anchorMin,
+            Vector2 anchorMax,
+            Vector2 pivot,
+            Vector2 anchoredPosition)
+        {
+            Transform container = settingsPanelRoot.transform;
+            GameObject toggleGo = new GameObject(objectName, typeof(RectTransform), typeof(Toggle));
+            toggleGo.transform.SetParent(container, false);
+
+            RectTransform rootRect = toggleGo.GetComponent<RectTransform>();
+            rootRect.sizeDelta = new Vector2(280f, 36f);
+            rootRect.anchorMin = anchorMin;
+            rootRect.anchorMax = anchorMax;
+            rootRect.pivot = pivot;
+            rootRect.anchoredPosition = anchoredPosition;
+
+            GameObject bgGo = new GameObject("Background", typeof(RectTransform), typeof(Image));
+            bgGo.transform.SetParent(toggleGo.transform, false);
+            RectTransform bgRect = bgGo.GetComponent<RectTransform>();
+            bgRect.anchorMin = new Vector2(0f, 0.5f);
+            bgRect.anchorMax = new Vector2(0f, 0.5f);
+            bgRect.pivot = new Vector2(0f, 0.5f);
+            bgRect.anchoredPosition = new Vector2(8f, 0f);
+            bgRect.sizeDelta = new Vector2(24f, 24f);
+            Image bgImage = bgGo.GetComponent<Image>();
+            bgImage.color = new Color(0.18f, 0.18f, 0.22f, 0.95f);
+
+            GameObject checkGo = new GameObject("Checkmark", typeof(RectTransform), typeof(Image));
+            checkGo.transform.SetParent(bgGo.transform, false);
+            RectTransform checkRect = checkGo.GetComponent<RectTransform>();
+            checkRect.anchorMin = new Vector2(0.15f, 0.15f);
+            checkRect.anchorMax = new Vector2(0.85f, 0.85f);
+            checkRect.offsetMin = Vector2.zero;
+            checkRect.offsetMax = Vector2.zero;
+            Image checkImage = checkGo.GetComponent<Image>();
+            checkImage.color = new Color(0.35f, 0.85f, 0.55f, 1f);
+
+            GameObject labelGo = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+            labelGo.transform.SetParent(toggleGo.transform, false);
+            RectTransform labelRect = labelGo.GetComponent<RectTransform>();
+            labelRect.anchorMin = new Vector2(0f, 0f);
+            labelRect.anchorMax = new Vector2(1f, 1f);
+            labelRect.offsetMin = new Vector2(42f, 0f);
+            labelRect.offsetMax = Vector2.zero;
+            TextMeshProUGUI label = labelGo.GetComponent<TextMeshProUGUI>();
+            label.text = labelText;
+            label.fontSize = 20f;
+            label.color = Color.white;
+            label.alignment = TextAlignmentOptions.MidlineLeft;
+            if (musicValueText != null && musicValueText.font != null)
+            {
+                label.font = musicValueText.font;
+            }
+
+            Toggle toggle = toggleGo.GetComponent<Toggle>();
+            toggle.targetGraphic = bgImage;
+            toggle.graphic = checkImage;
+            return toggle;
         }
 
         private void SavePreferences()

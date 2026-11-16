@@ -36,6 +36,14 @@ namespace FingerMonster.Gameplay
         private Vector3 initialCapLocalPos;
         private Vector3 initialLocalScale;
         private bool isHovered = false;
+        private bool hasXRayReveal = false;
+        private bool xRayIsTrap = false;
+        private bool isCursed = false;
+        private bool curseVisibleToLocal = false;
+
+        public bool HasXRayReveal => hasXRayReveal;
+        public bool XRayIsTrap => xRayIsTrap;
+        public bool IsCursed => isCursed;
 
         private void Awake()
         {
@@ -136,12 +144,79 @@ namespace FingerMonster.Gameplay
             }
             else
             {
-                SetMaterialVisuals(normalColor, isEmissive: false);
+                if (hasXRayReveal)
+                {
+                    Color xrayCol = xRayIsTrap ? new Color(1.0f, 0.22f, 0.22f) : new Color(0.20f, 0.98f, 0.55f);
+                    SetMaterialVisuals(xrayCol, isEmissive: true, emissiveCol: xrayCol * 2.2f);
+                }
+                else if (isCursed && curseVisibleToLocal)
+                {
+                    ApplyCursedVisual();
+                }
+                else
+                {
+                    SetMaterialVisuals(normalColor, isEmissive: false);
+                }
+
                 if (initialLocalScale != Vector3.zero)
                 {
                     transform.localScale = initialLocalScale;
                 }
             }
+        }
+
+        public void ApplyXRayVisual(bool isTrap)
+        {
+            if (IsPressed) return;
+            hasXRayReveal = true;
+            xRayIsTrap = isTrap;
+            Color xrayCol = isTrap ? new Color(1.0f, 0.22f, 0.22f) : new Color(0.20f, 0.98f, 0.55f);
+            SetMaterialVisuals(xrayCol, isEmissive: true, emissiveCol: xrayCol * 2.2f);
+        }
+
+        public void ClearXRayVisual()
+        {
+            hasXRayReveal = false;
+            xRayIsTrap = false;
+            if (!IsPressed && !isHovered)
+            {
+                if (isCursed && curseVisibleToLocal)
+                {
+                    ApplyCursedVisual();
+                }
+                else
+                {
+                    SetMaterialVisuals(normalColor, isEmissive: false);
+                }
+            }
+        }
+
+        public void SetCursedVisual(bool cursed, bool visibleToLocalGhost)
+        {
+            isCursed = cursed;
+            curseVisibleToLocal = visibleToLocalGhost;
+
+            if (IsPressed) return;
+
+            if (cursed && visibleToLocalGhost)
+            {
+                ApplyCursedVisual();
+            }
+            else if (hasXRayReveal)
+            {
+                Color xrayCol = xRayIsTrap ? new Color(1.0f, 0.22f, 0.22f) : new Color(0.20f, 0.98f, 0.55f);
+                SetMaterialVisuals(xrayCol, isEmissive: true, emissiveCol: xrayCol * 2.2f);
+            }
+            else
+            {
+                SetMaterialVisuals(normalColor, isEmissive: false);
+            }
+        }
+
+        private void ApplyCursedVisual()
+        {
+            Color curseCol = new Color(0.72f, 0.22f, 0.96f);
+            SetMaterialVisuals(curseCol, isEmissive: true, emissiveCol: curseCol * 2.4f);
         }
 
         #region EVENT SYSTEM & MOUSE FALLBACKS
@@ -171,6 +246,18 @@ namespace FingerMonster.Gameplay
                 return;
             }
 
+            if (FingerMonster.Player.PlayerInputHandler.OnKeyClickIntercept != null &&
+                FingerMonster.Player.PlayerInputHandler.OnKeyClickIntercept.Invoke(keyIndex))
+            {
+                return;
+            }
+
+            if (GameManager.Instance.IsWaitingForXRayKeyTarget)
+            {
+                GameManager.Instance.ConfirmXRayKeyTarget(keyIndex);
+                return;
+            }
+
             int activePlayer = GameManager.Instance.ActivePlayerIndex;
             if (GameManager.Instance.IsBotPlayer(activePlayer)) return;
 
@@ -186,6 +273,10 @@ namespace FingerMonster.Gameplay
         {
             IsPressed = true;
             isHovered = false;
+            hasXRayReveal = false;
+            xRayIsTrap = false;
+            isCursed = false;
+            curseVisibleToLocal = false;
 
             transform.localScale = initialLocalScale;
             Color pressedCol = isTrap ? trapPressedColor : safePressedColor;
@@ -218,6 +309,10 @@ namespace FingerMonster.Gameplay
         {
             IsPressed = false;
             isHovered = false;
+            hasXRayReveal = false;
+            xRayIsTrap = false;
+            isCursed = false;
+            curseVisibleToLocal = false;
 
             if (movingCap != null && initialCapLocalPos != Vector3.zero)
             {
@@ -235,7 +330,8 @@ namespace FingerMonster.Gameplay
         {
             if (keyMaterial != null)
             {
-                Destroy(keyMaterial);
+                DestroyImmediate(keyMaterial);
+                keyMaterial = null;
             }
         }
     }

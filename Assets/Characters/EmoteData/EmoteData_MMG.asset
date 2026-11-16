@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82941efa032df5c4bb4ff98c42078530, type: 3}
+  m_Name: EmoteData_MMG
+  m_EditorClassIdentifier: Assembly-CSharp::FingerMonster.Player.CharacterEmoteData
+  Archetype: 3
+  CharacterName: MMG
+  PersonalityTag: "\u015Eovmen"
+  Slots:
+  - SlotNumber: 1
+    DisplayName: "\u015Eovmen Dans\u0131"
+    PopupText: "SAHNE BEN\u0130M!"
+    PopupColor: {r: 1, g: 0.8, b: 0.2, a: 1}
+    ExpectedMixamoFile: Emote1_MMG.fbx
+    RecommendedMixamoSearch: Crazy Gesture / Hip Hop Dance
+    Description: "VIP tarz\u0131 \xE7\u0131lg\u0131n \u015Fov hareketi yapar."
+  - SlotNumber: 2
+    DisplayName: "Alk\u0131\u015F \u0130steme"
+    PopupText: "ALKI\u015ELAR BANA!"
+    PopupColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    ExpectedMixamoFile: Emote2_MMG.fbx
+    RecommendedMixamoSearch: Sitting Clap / Cheering
+    Description: "Masadakilerden alk\u0131\u015F toplar."
+  - SlotNumber: 3
+    DisplayName: "Sahne Kahkahas\u0131"
+    PopupText: "HAHAHA HAR\u0130KA!"
+    PopupColor: {r: 1, g: 0.65, b: 0.15, a: 1}
+    ExpectedMixamoFile: Emote3_MMG.fbx
+    RecommendedMixamoSearch: Sitting Laughing / Victory
+    Description: "G\xF6steri\u015Fli bir sahne kahkahas\u0131 atar."
+  - SlotNumber: 4
+    DisplayName: Artist Hareket
+    PopupText: "\u0130ZLE VE \xD6\u011EREN!"
+    PopupColor: {r: 1, g: 1, b: 1, a: 1}
+    ExpectedMixamoFile: Emote4_MMG.fbx
+    RecommendedMixamoSearch: Taunt Gesture / Bow
+    Description: "Artist\xE7e rakibe hava atar."
+  - SlotNumber: 5
+    DisplayName: "Spot I\u015F\u0131\u011F\u0131"
+    PopupText: SIRA SENDE YILDIZ!
+    PopupColor: {r: 1, g: 0.85, b: 0.35, a: 1}
+    ExpectedMixamoFile: Emote5_MMG.fbx
+    RecommendedMixamoSearch: Pointing / Jazz Hands
+    Description: "Rakibi spot \u0131\u015F\u0131\u011F\u0131na \xE7\u0131kar\u0131r
+      gibi i\u015Faret eder."

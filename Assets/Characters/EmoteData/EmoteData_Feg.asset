@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82941efa032df5c4bb4ff98c42078530, type: 3}
+  m_Name: EmoteData_Feg
+  m_EditorClassIdentifier: Assembly-CSharp::FingerMonster.Player.CharacterEmoteData
+  Archetype: 0
+  CharacterName: Feg
+  PersonalityTag: Cesur
+  Slots:
+  - SlotNumber: 1
+    DisplayName: "G\xFCr Kahkaha"
+    PopupText: MUAHAHA!
+    PopupColor: {r: 1, g: 0.35, b: 0.25, a: 1}
+    ExpectedMixamoFile: Emote1_Feg.fbx
+    RecommendedMixamoSearch: Sitting Laughing / Laughing
+    Description: "Rakibin haline kahkahalarla g\xFCler."
+  - SlotNumber: 2
+    DisplayName: Meydan Okuma
+    PopupText: GEL BURAYA!
+    PopupColor: {r: 1, g: 0.55, b: 0.15, a: 1}
+    ExpectedMixamoFile: Emote2_Feg.fbx
+    RecommendedMixamoSearch: Taunt Gesture / Chest Pound
+    Description: Rakibe korkusuzca meydan okur.
+  - SlotNumber: 3
+    DisplayName: "S\u0131radaki Sensin"
+    PopupText: "SIRADAK\u0130 SENS\u0130N!"
+    PopupColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    ExpectedMixamoFile: Emote3_Feg.fbx
+    RecommendedMixamoSearch: Pointing / Pointing Threat
+    Description: "Parma\u011F\u0131yla hedef rakibi i\u015Faret eder."
+  - SlotNumber: 4
+    DisplayName: "A\u011F\u0131r Alk\u0131\u015F"
+    PopupText: "BRAVO PA\u015EAM!"
+    PopupColor: {r: 0.95, g: 0.75, b: 0.25, a: 1}
+    ExpectedMixamoFile: Emote4_Feg.fbx
+    RecommendedMixamoSearch: Sitting Clap / Sarcastic Clap
+    Description: "Rakibin hamlesini alayc\u0131 \u015Fekilde alk\u0131\u015Flar."
+  - SlotNumber: 5
+    DisplayName: "Deli Bak\u0131\u015F\u0131"
+    PopupText: "KAFAYI YED\u0130M!"
+    PopupColor: {r: 1, g: 0, b: 0, a: 1}
+    ExpectedMixamoFile: Emote5_Feg.fbx
+    RecommendedMixamoSearch: Crazy Gesture / Flexing
+    Description: "\xC7\u0131lg\u0131nca el kol hareketleri yapar."

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using FingerMonster.Core;
+using FingerMonster.Gameplay;
 using FingerMonster.Player;
 
 namespace FingerMonster.AI
@@ -24,28 +25,58 @@ namespace FingerMonster.AI
         {
             if (Instance != null && Instance != this)
             {
-                Destroy(gameObject);
-                return;
+                if (Instance.gameObject != gameObject)
+                {
+                    Destroy(Instance.gameObject);
+                }
+                else
+                {
+                    Destroy(this);
+                    return;
+                }
             }
             Instance = this;
 
             brain = GetComponent<AIBrain>();
         }
 
+        private void OnEnable()
+        {
+            SubscribeToGameManager();
+        }
+
         private void Start()
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.OnTurnChanged += HandleTurnChanged;
-            }
+            SubscribeToGameManager();
+        }
+
+        private void SubscribeToGameManager()
+        {
+            if (GameManager.Instance == null) return;
+
+            GameManager.Instance.OnTurnChanged -= HandleTurnChanged;
+            GameManager.Instance.OnTurnChanged += HandleTurnChanged;
+            GameManager.Instance.OnCardSelectionStarted -= HandleCardSelectionStarted;
+            GameManager.Instance.OnCardSelectionStarted += HandleCardSelectionStarted;
+        }
+
+        private void UnsubscribeFromGameManager()
+        {
+            if (GameManager.Instance == null) return;
+
+            GameManager.Instance.OnTurnChanged -= HandleTurnChanged;
+            GameManager.Instance.OnCardSelectionStarted -= HandleCardSelectionStarted;
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeFromGameManager();
         }
 
         private void OnDestroy()
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.OnTurnChanged -= HandleTurnChanged;
-            }
+            if (Instance == this) Instance = null;
+            UnsubscribeFromGameManager();
         }
 
         public void SetPlayerAsBot(int playerIndex, bool isBot)
@@ -65,9 +96,32 @@ namespace FingerMonster.AI
             return false;
         }
 
+        private void HandleCardSelectionStarted(PlayerData activePlayer)
+        {
+            if (activePlayer == null) return;
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.CardPlay) return;
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.CardSelection) return;
+
+            if (IsBot(activePlayer.PlayerId) && brain != null)
+            {
+                CardSelectionController cardCtrl = CardSelectionController.Instance != null
+                    ? CardSelectionController.Instance
+                    : (GameManager.Instance != null && GameManager.Instance.CardController != null
+                        ? GameManager.Instance.CardController
+                        : UnityEngine.Object.FindFirstObjectByType<CardSelectionController>(FindObjectsInactive.Include));
+
+                if (cardCtrl != null)
+                {
+                    brain.DecideAndExecuteCard(activePlayer.PlayerId, cardCtrl);
+                }
+            }
+        }
+
         private void HandleTurnChanged(PlayerData activePlayer)
         {
             if (activePlayer == null) return;
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.CardPlay) return;
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.PlayerTurn) return;
 
             if (IsBot(activePlayer.PlayerId) && brain != null)
             {
@@ -76,4 +130,3 @@ namespace FingerMonster.AI
         }
     }
 }
-

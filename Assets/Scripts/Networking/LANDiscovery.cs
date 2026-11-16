@@ -39,6 +39,8 @@ namespace FingerMonster.Networking
         [SerializeField] private float broadcastInterval = 1.0f;
         [SerializeField] private float roomTimeout = 3.5f;
 
+        private static readonly System.Diagnostics.Stopwatch netTimer = System.Diagnostics.Stopwatch.StartNew();
+
         private UdpClient broadcastSender;
         private UdpClient broadcastReceiver;
         private Thread receiveThread;
@@ -94,9 +96,10 @@ namespace FingerMonster.Networking
                 lock (lockObj)
                 {
                     List<string> expiredKeys = new List<string>();
+                    float currentTime = (float)netTimer.Elapsed.TotalSeconds;
                     foreach (var kvp in discoveredRooms)
                     {
-                        if (Time.time - kvp.Value.LastSeenTime > roomTimeout)
+                        if (currentTime - kvp.Value.LastSeenTime > roomTimeout)
                         {
                             expiredKeys.Add(kvp.Key);
                         }
@@ -280,7 +283,7 @@ namespace FingerMonster.Networking
                                 r.Port = gamePort;
                                 r.CurrentPlayers = cur;
                                 r.MaxPlayers = max;
-                                r.LastSeenTime = Time.time;
+                                r.LastSeenTime = (float)netTimer.Elapsed.TotalSeconds;
                             }
                         }
                     }

@@ -17,6 +17,8 @@ namespace FingerMonster.Player
         [SerializeField] private LayerMask keyLayerMask = ~0;
         [SerializeField] private float raycastDistance = 20.0f;
 
+        public static System.Func<int, bool> OnKeyClickIntercept;
+
         private Camera mainCamera;
         private TypewriterKey currentHoveredKey;
         private int gamepadSelectedIndex = 0;
@@ -33,13 +35,24 @@ namespace FingerMonster.Player
             // Pause kontrolü (ESC veya Gamepad Start)
             HandlePauseInput();
 
+            // Kamera emote nedeniyle yana dönükken daktilo tuşlarına basmayı engelle
+            if (PlayerCameraController.Instance != null && PlayerCameraController.Instance.IsEmotePanActive)
+            {
+                ClearHover();
+                return;
+            }
+
             bool isNetwork = NetworkGameManager.Instance != null && NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening;
 
             if (isNetwork)
             {
-                // Ağ oyununda sıra yerel oyuncuda değilse veya tur bekleme durumunda değilse girdiyi engelle
-                if (!NetworkGameManager.Instance.IsLocalPlayerTurn ||
-                    NetworkGameManager.Instance.CurrentNetworkState.Value != GameState.PlayerTurn)
+                // Ağ oyununda hayalet lanet hedefi seçiyorsa veya yaşayan yerel oyuncunun sırasıysa girdiye izin ver
+                bool canSelectAsGhost = NetworkGameManager.Instance.IsWaitingForGhostCurseTarget;
+                bool canPlayAsLiving = NetworkGameManager.Instance.IsLocalPlayerTurn &&
+                    NetworkGameManager.Instance.CurrentNetworkState.Value == GameState.PlayerTurn &&
+                    !NetworkGameManager.Instance.IsLocalGhost;
+
+                if (!canSelectAsGhost && !canPlayAsLiving)
                 {
                     ClearHover();
                     return;
@@ -47,10 +60,14 @@ namespace FingerMonster.Player
             }
             else
             {
-                // Yerel oyunda oyun şu an oyuncunun tuş seçmesini beklemiyorsa veya sıra bir botta ise insan girdisini engelle
-                if (GameManager.Instance == null || 
-                    GameManager.Instance.CurrentState != GameState.PlayerTurn ||
-                    GameManager.Instance.IsBotPlayer(GameManager.Instance.ActivePlayerIndex))
+                // Yerel oyunda hayalet lanet hedefi seçiyorsa veya yaşayan insan oyuncunun sırasıysa girdiye izin ver
+                bool canSelectAsGhost = GameManager.Instance != null && GameManager.Instance.IsWaitingForGhostCurseTarget;
+                bool canPlayAsLiving = GameManager.Instance != null &&
+                    GameManager.Instance.CurrentState == GameState.PlayerTurn &&
+                    !GameManager.Instance.IsBotPlayer(GameManager.Instance.ActivePlayerIndex) &&
+                    !GameManager.Instance.IsLocalHumanGhost();
+
+                if (!canSelectAsGhost && !canPlayAsLiving)
                 {
                     ClearHover();
                     return;
@@ -95,10 +112,14 @@ namespace FingerMonster.Player
                 mousePos = Mouse.current.position.ReadValue();
                 leftClicked = Mouse.current.leftButton.wasPressedThisFrame;
             }
+            else if (Pointer.current != null)
+            {
+                mousePos = Pointer.current.position.ReadValue();
+                leftClicked = Pointer.current.press.wasPressedThisFrame;
+            }
             else
             {
-                mousePos = UnityEngine.Input.mousePosition;
-                leftClicked = UnityEngine.Input.GetMouseButtonDown(0);
+                return;
             }
 
             Ray ray = mainCamera.ScreenPointToRay(mousePos);
@@ -235,7 +256,41 @@ namespace FingerMonster.Player
 
         private void TryPressKey(int keyIndex)
         {
+            if (OnKeyClickIntercept != null && OnKeyClickIntercept.Invoke(keyIndex))
+            {
+                ClearHover();
+                return;
+            }
+
             bool isNetwork = NetworkGameManager.Instance != null && NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening;
+            if (isNetwork && NetworkGameManager.Instance.IsWaitingForGhostCurseTarget)
+            {
+                NetworkGameManager.Instance.LocalRequestGhostCurseKey(keyIndex);
+                ClearHover();
+                return;
+            }
+
+            if (!isNetwork && GameManager.Instance != null && GameManager.Instance.IsWaitingForGhostCurseTarget)
+            {
+                GameManager.Instance.TryGhostCurseKey(GameManager.Instance.GetLocalHumanSeatIndex(), keyIndex);
+                ClearHover();
+                return;
+            }
+
+            // Kamera emote nedeniyle yana dönükken daktilo tuşlarına basmayı engelle
+            if (PlayerCameraController.Instance != null && PlayerCameraController.Instance.IsEmotePanActive)
+            {
+                ClearHover();
+                return;
+            }
+
+            if (!isNetwork && GameManager.Instance != null && GameManager.Instance.IsWaitingForXRayKeyTarget)
+            {
+                GameManager.Instance.ConfirmXRayKeyTarget(keyIndex);
+                ClearHover();
+                return;
+            }
+
             if (isNetwork)
             {
                 NetworkGameManager.Instance.LocalRequestPressKey(keyIndex);

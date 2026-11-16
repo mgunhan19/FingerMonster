@@ -6,6 +6,8 @@ using Unity.Netcode;
 using FingerMonster.Networking;
 using FingerMonster.Audio;
 using FingerMonster.AI;
+using FingerMonster.Core;
+using FingerMonster.Player;
 
 namespace FingerMonster.UI
 {
@@ -75,6 +77,18 @@ namespace FingerMonster.UI
             {
                 directPortInput.text = "7777";
             }
+
+            EnsureLobbyRaycastBlocker();
+        }
+
+        private void EnsureLobbyRaycastBlocker()
+        {
+            if (lobbyRoot == null) return;
+            Image rootImg = lobbyRoot.GetComponent<Image>();
+            if (rootImg != null)
+            {
+                rootImg.raycastTarget = true;
+            }
         }
 
         private void Start()
@@ -131,6 +145,7 @@ namespace FingerMonster.UI
         public void OpenLobby()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayUIClick();
+            EnsureLobbyRaycastBlocker();
             if (lobbyRoot != null) lobbyRoot.SetActive(true);
             ShowBrowserPanel();
         }
@@ -310,6 +325,11 @@ namespace FingerMonster.UI
             if (seatCardsContainer == null) return;
             seatCardControllers.Clear();
 
+            for (int c = seatCardsContainer.childCount - 1; c >= 0; c--)
+            {
+                Destroy(seatCardsContainer.GetChild(c).gameObject);
+            }
+
             // 4 Koltuk için UI kartlarını hazırla
             string[] seatPositions = new string[] { "Güney (Ön)", "Kuzey (Karşı)", "Batı (Sol)", "Doğu (Sağ)" };
             Color[] seatColors = new Color[]
@@ -326,37 +346,53 @@ namespace FingerMonster.UI
                 cardObj.transform.SetParent(seatCardsContainer, false);
 
                 var rect = cardObj.AddComponent<RectTransform>();
-                rect.sizeDelta = new Vector2(180, 220);
+                rect.sizeDelta = new Vector2(186, 226);
 
                 var img = cardObj.AddComponent<Image>();
-                img.color = new Color(0.14f, 0.14f, 0.18f, 0.95f);
+                img.color = new Color(0.13f, 0.13f, 0.17f, 0.96f);
+
+                Outline cardOutline = cardObj.AddComponent<Outline>();
+                cardOutline.effectColor = new Color(seatColors[i].r, seatColors[i].g, seatColors[i].b, 0.65f);
+                cardOutline.effectDistance = new Vector2(2f, -2f);
+
+                // Üst Renk Şeridi
+                GameObject topStripeObj = new GameObject("TopColorStripe");
+                topStripeObj.transform.SetParent(cardObj.transform, false);
+                var stripeRect = topStripeObj.AddComponent<RectTransform>();
+                stripeRect.anchorMin = new Vector2(0f, 0.96f);
+                stripeRect.anchorMax = new Vector2(1f, 1f);
+                stripeRect.offsetMin = Vector2.zero;
+                stripeRect.offsetMax = Vector2.zero;
+                var stripeImg = topStripeObj.AddComponent<Image>();
+                stripeImg.color = seatColors[i];
+                stripeImg.raycastTarget = false;
 
                 // Koltuk başlığı
                 GameObject seatTitle = new GameObject("SeatTitle");
                 seatTitle.transform.SetParent(cardObj.transform, false);
                 var tRect = seatTitle.AddComponent<RectTransform>();
-                tRect.anchorMin = new Vector2(0, 0.75f);
-                tRect.anchorMax = new Vector2(1, 1);
+                tRect.anchorMin = new Vector2(0, 0.74f);
+                tRect.anchorMax = new Vector2(1, 0.95f);
                 tRect.offsetMin = Vector2.zero;
                 tRect.offsetMax = Vector2.zero;
                 var tText = seatTitle.AddComponent<TextMeshProUGUI>();
-                tText.text = $"KOLTUK {i + 1}\n<size=14>{seatPositions[i]}</size>";
-                tText.fontSize = 18;
+                tText.text = $"KOLTUK {i + 1}\n<size=13>{seatPositions[i]}</size>";
+                tText.fontSize = 17;
                 tText.fontStyle = FontStyles.Bold;
                 tText.color = seatColors[i];
                 tText.alignment = TextAlignmentOptions.Center;
 
-                // Oyuncu Adı
+                // Oyuncu ve Karakter Adı / Unvanı
                 GameObject nameObj = new GameObject("PlayerName");
                 nameObj.transform.SetParent(cardObj.transform, false);
                 var nRect = nameObj.AddComponent<RectTransform>();
-                nRect.anchorMin = new Vector2(0, 0.35f);
-                nRect.anchorMax = new Vector2(1, 0.7f);
+                nRect.anchorMin = new Vector2(0.04f, 0.32f);
+                nRect.anchorMax = new Vector2(0.96f, 0.73f);
                 nRect.offsetMin = Vector2.zero;
                 nRect.offsetMax = Vector2.zero;
                 var nText = nameObj.AddComponent<TextMeshProUGUI>();
                 nText.text = "BOŞ";
-                nText.fontSize = 20;
+                nText.fontSize = 17;
                 nText.fontStyle = FontStyles.Bold;
                 nText.color = Color.gray;
                 nText.alignment = TextAlignmentOptions.Center;
@@ -365,8 +401,8 @@ namespace FingerMonster.UI
                 GameObject statusObj = new GameObject("StatusBadge");
                 statusObj.transform.SetParent(cardObj.transform, false);
                 var sRect = statusObj.AddComponent<RectTransform>();
-                sRect.anchorMin = new Vector2(0.1f, 0.08f);
-                sRect.anchorMax = new Vector2(0.9f, 0.3f);
+                sRect.anchorMin = new Vector2(0.1f, 0.07f);
+                sRect.anchorMax = new Vector2(0.9f, 0.27f);
                 sRect.offsetMin = Vector2.zero;
                 sRect.offsetMax = Vector2.zero;
                 var sImg = statusObj.AddComponent<Image>();
@@ -380,7 +416,7 @@ namespace FingerMonster.UI
                 stRect.sizeDelta = Vector2.zero;
                 var stText = sTextObj.AddComponent<TextMeshProUGUI>();
                 stText.text = "-";
-                stText.fontSize = 16;
+                stText.fontSize = 15;
                 stText.fontStyle = FontStyles.Bold;
                 stText.color = Color.white;
                 stText.alignment = TextAlignmentOptions.Center;
@@ -388,12 +424,21 @@ namespace FingerMonster.UI
                 PlayerSeatCardUI cardCtrl = new PlayerSeatCardUI
                 {
                     Root = cardObj,
+                    CardBackground = img,
+                    CardOutline = cardOutline,
+                    TopStripe = stripeImg,
+                    SeatTitleText = tText,
                     NameText = nText,
                     StatusText = stText,
                     StatusBackground = sImg
                 };
                 seatCardControllers.Add(cardCtrl);
             }
+        }
+
+        public void RefreshRoomUI()
+        {
+            RefreshRoomSeatsUI();
         }
 
         private void RefreshRoomSeatsUI()
@@ -429,15 +474,35 @@ namespace FingerMonster.UI
             for (int i = 0; i < seatCardControllers.Count; i++)
             {
                 var card = seatCardControllers[i];
+                var charArch = GameSessionData.GetSeatArchetype(i);
+                var charDef = CharacterDefinition.GetDefinition(charArch);
+                string accentHex = ColorUtility.ToHtmlStringRGB(charDef.AccentColor);
+
+                if (card.TopStripe != null)
+                {
+                    card.TopStripe.color = charDef.PrimaryColor;
+                }
+                if (card.SeatTitleText != null)
+                {
+                    card.SeatTitleText.color = charDef.PrimaryColor;
+                }
+                if (card.CardOutline != null)
+                {
+                    card.CardOutline.effectColor = new Color(charDef.PrimaryColor.r, charDef.PrimaryColor.g, charDef.PrimaryColor.b, 0.72f);
+                }
+
                 if (i < connectedCount)
                 {
                     ulong cId = clients[i].ClientId;
                     bool isMe = (cId == NetworkManager.Singleton.LocalClientId);
-                    string displayName = isMe ? $"{NetworkRoomManager.Instance?.LocalPlayerName ?? "Oyuncu"} (SEN)" : $"Oyuncu {i + 1}";
-                    if (cId == NetworkManager.Singleton.LocalClientId && isServer) displayName += " [HOST]";
+                    string baseName = isMe ? $"{NetworkRoomManager.Instance?.LocalPlayerName ?? "Oyuncu"} (SEN)" : $"Oyuncu {i + 1}";
+                    if (cId == NetworkManager.Singleton.LocalClientId && isServer) baseName += " [HOST]";
 
-                    card.NameText.text = displayName;
-                    card.NameText.color = Color.white;
+                    card.NameText.text =
+                        $"<b>{charDef.DisplayName}</b> <size=13><color=#{accentHex}>[{charDef.PersonalityTag}]</color></size>\n" +
+                        $"<size=12><color=#D5CFC4><i>{charDef.Title}</i></color></size>\n" +
+                        $"<size=13><color=#FFFFFF>{baseName}</color></size>";
+                    card.NameText.color = charDef.PrimaryColor;
 
                     // Hazır durumu
                     card.StatusText.text = isServer ? "HOST" : (isLocalReady && isMe ? "HAZIR" : "BEKLİYOR");
@@ -445,14 +510,20 @@ namespace FingerMonster.UI
                 }
                 else if (fillBots)
                 {
-                    card.NameText.text = $"Bot {i + 1}";
-                    card.NameText.color = new Color(0.7f, 0.85f, 1f);
+                    card.NameText.text =
+                        $"<b>{charDef.DisplayName}</b> <size=13><color=#{accentHex}>[{charDef.PersonalityTag}]</color></size>\n" +
+                        $"<size=12><color=#D5CFC4><i>{charDef.Title}</i></color></size>\n" +
+                        $"<size=13><color=#9CC8F5>(Yapay Zekâ Bot)</color></size>";
+                    card.NameText.color = charDef.PrimaryColor;
                     card.StatusText.text = "BOT (HAZIR)";
                     card.StatusBackground.color = new Color(0.2f, 0.5f, 0.8f);
                 }
                 else
                 {
-                    card.NameText.text = "BOŞ KOLTUK";
+                    card.NameText.text =
+                        $"<b>{charDef.DisplayName}</b> <size=13>[{charDef.PersonalityTag}]</size>\n" +
+                        $"<size=12><i>{charDef.Title}</i></size>\n" +
+                        $"<size=13>BOŞ KOLTUK</size>";
                     card.NameText.color = Color.gray;
                     card.StatusText.text = "BEKLENİYOR";
                     card.StatusBackground.color = new Color(0.3f, 0.3f, 0.3f);
@@ -536,6 +607,10 @@ namespace FingerMonster.UI
         private class PlayerSeatCardUI
         {
             public GameObject Root;
+            public Image CardBackground;
+            public Outline CardOutline;
+            public Image TopStripe;
+            public TextMeshProUGUI SeatTitleText;
             public TextMeshProUGUI NameText;
             public TextMeshProUGUI StatusText;
             public Image StatusBackground;

@@ -42,7 +42,7 @@ namespace FingerMonster.UI
             }
         }
 
-        public void ShowGameOver(PlayerData winner, IReadOnlyList<PlayerData> allPlayers)
+        public void ShowGameOver(PlayerData winner, IReadOnlyList<PlayerData> allPlayers, string overrideScoreRecap = null)
         {
             if (panelRoot != null)
             {
@@ -57,9 +57,11 @@ namespace FingerMonster.UI
 
             if (winner != null)
             {
+                CharacterDefinition winDef = CharacterDefinition.GetDefinition(winner.Archetype);
+                string winPersonality = string.IsNullOrEmpty(winner.PersonalityTag) ? winDef.PersonalityTag : winner.PersonalityTag;
                 if (winnerTitleText != null)
                 {
-                    winnerTitleText.text = $"KAZANAN: {winner.PlayerName}!";
+                    winnerTitleText.text = $"KAZANAN: {winner.PlayerName}\n<size=26>[{winPersonality} - {winDef.Title}]</size>";
                     winnerTitleText.color = winner.PlayerColor;
                 }
 
@@ -91,16 +93,25 @@ namespace FingerMonster.UI
                 }
             }
 
-            if (scoreBoardText != null && allPlayers != null)
+            if (scoreBoardText != null)
             {
-                string recap = "--- OYUN SKOR TABLOSU ---\n";
-                for (int i = 0; i < allPlayers.Count; i++)
+                if (allPlayers != null)
                 {
-                    var p = allPlayers[i];
-                    string status = p.IsAlive ? $"({p.RemainingHandsCount} El Kaldı)" : "(Kasap Tarafından Elendi)";
-                    recap += $"{p.PlayerName}: {p.Score} Puan {status}\n";
+                    string recap = "--- OYUN SKOR TABLOSU ---\n";
+                    for (int i = 0; i < allPlayers.Count; i++)
+                    {
+                        var p = allPlayers[i];
+                        var def = CharacterDefinition.GetDefinition(p.Archetype);
+                        string pTag = string.IsNullOrEmpty(p.PersonalityTag) ? def.PersonalityTag : p.PersonalityTag;
+                        string status = p.IsAlive ? $"({p.RemainingHandsCount} El Kaldı)" : "(Kasap Tarafından Elendi)";
+                        recap += $"{p.PlayerName} [{pTag}]: {p.Score} Puan {status}\n";
+                    }
+                    scoreBoardText.text = recap;
                 }
-                scoreBoardText.text = recap;
+                else if (!string.IsNullOrEmpty(overrideScoreRecap))
+                {
+                    scoreBoardText.text = overrideScoreRecap;
+                }
             }
         }
 
@@ -112,6 +123,24 @@ namespace FingerMonster.UI
         private void OnRestartClicked()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayUIClick();
+            Time.timeScale = 1f;
+
+            if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
+            {
+                if (Unity.Netcode.NetworkManager.Singleton.IsServer)
+                {
+                    // Host / Sunucu yetkili yeniden yükleme: Tüm istemciler senkronize şekilde odaya döner
+                    Unity.Netcode.NetworkManager.Singleton.SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+                    return;
+                }
+                else
+                {
+                    // İstemci solo moda düşmemek için yerel LoadScene çağırmaz; sunucunun odayı yeniden başlatmasını bekler
+                    Debug.Log("[GameOverUIController] İstemci restart talep etti; sunucunun sahneyi yeniden yüklemesi bekleniyor.");
+                    return;
+                }
+            }
+
             Scene current = SceneManager.GetActiveScene();
             SceneManager.LoadScene(current.name);
         }
@@ -119,6 +148,13 @@ namespace FingerMonster.UI
         private void OnMainMenuClicked()
         {
             if (AudioManager.Instance != null) AudioManager.Instance.PlayUIClick();
+            Time.timeScale = 1f;
+
+            if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
+            {
+                Unity.Netcode.NetworkManager.Singleton.Shutdown();
+            }
+
             SceneManager.LoadScene("MainMenu");
         }
     }

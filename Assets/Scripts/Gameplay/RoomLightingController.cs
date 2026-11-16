@@ -13,6 +13,7 @@ namespace FingerMonster.Gameplay
         [SerializeField] private Light tableSpotLight;
         [SerializeField] private Light ambientRoomLight;
         [SerializeField] private Light dramaticRedLight;
+        [SerializeField] private FlickeringBulb flickeringBulb;
 
         [Header("Varsayılan Değerler")]
         [SerializeField] private float normalSpotIntensity = 2.5f;
@@ -30,11 +31,18 @@ namespace FingerMonster.Gameplay
 
         private void Awake()
         {
-            if (Instance == null)
+            if (Instance != null && Instance != this)
             {
-                Instance = this;
+                Destroy(gameObject);
+                return;
             }
+            Instance = this;
             ApplyNormalLighting(instant: true);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
 
         /// <summary>
@@ -94,6 +102,11 @@ namespace FingerMonster.Gameplay
                 dramaticRedLight.enabled = redLightActive;
             }
 
+            if (flickeringBulb != null)
+            {
+                flickeringBulb.SetMuted(redLightActive);
+            }
+
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
@@ -142,13 +155,19 @@ namespace FingerMonster.Gameplay
             {
                 dramaticRedLight.enabled = false;
             }
+
+            if (flickeringBulb != null)
+            {
+                flickeringBulb.SetMuted(false);
+            }
         }
 
-        public void SetupLights(Light spot, Light ambient, Light dramatic)
+        public void SetupLights(Light spot, Light ambient, Light dramatic, FlickeringBulb bulb = null)
         {
             tableSpotLight = spot;
             ambientRoomLight = ambient;
             dramaticRedLight = dramatic;
+            flickeringBulb = bulb;
             ApplyNormalLighting(instant: true);
         }
     }

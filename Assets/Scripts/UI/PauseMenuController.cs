@@ -64,6 +64,10 @@ namespace FingerMonster.UI
         {
             Time.timeScale = 1f;
             if (AudioManager.Instance != null) AudioManager.Instance.PlayUIClick();
+            if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
+            {
+                Unity.Netcode.NetworkManager.Singleton.Shutdown();
+            }
             Scene current = SceneManager.GetActiveScene();
             SceneManager.LoadScene(current.name);
         }
@@ -72,6 +76,10 @@ namespace FingerMonster.UI
         {
             Time.timeScale = 1f;
             if (AudioManager.Instance != null) AudioManager.Instance.PlayUIClick();
+            if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
+            {
+                Unity.Netcode.NetworkManager.Singleton.Shutdown();
+            }
             SceneManager.LoadScene("MainMenu");
         }
     }

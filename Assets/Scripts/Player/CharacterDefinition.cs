@@ -52,11 +52,22 @@ namespace FingerMonster.Player
     {
         public CharacterArchetype Archetype;
         public string DisplayName;
+        public string PersonalityTag;
         public string Title;
         public string Description;
+        public string ModelAssetName;
+        public string PrefabAssetPath;
         public Color PrimaryColor;
         public Color AccentColor;
         public EmoteType[] AvailableEmotes;
+
+        public string FullDisplayLabel => $"{DisplayName} [{PersonalityTag}]";
+
+        public static CharacterDefinition GetDefinitionBySeat(int seatIndex)
+        {
+            int clamped = Mathf.Clamp(seatIndex, 0, 3);
+            return GetDefinition((CharacterArchetype)clamped);
+        }
 
         public static CharacterDefinition GetDefinition(CharacterArchetype archetype)
         {
@@ -66,11 +77,14 @@ namespace FingerMonster.Player
                     return new CharacterDefinition
                     {
                         Archetype = CharacterArchetype.Kabadayi,
-                        DisplayName = "Kabadayı Kazım",
-                        Title = "Masaların Belalısı",
-                        Description = "Geniş omuzlu, çatık kaşlı ve korkusuz. Rakiplerine gözdağı vermeye bayılır.",
-                        PrimaryColor = new Color(0.85f, 0.2f, 0.2f),
-                        AccentColor = new Color(0.95f, 0.75f, 0.2f),
+                        DisplayName = "Feg",
+                        PersonalityTag = "Cesur",
+                        Title = "Korkusuz Taktikçi",
+                        Description = "Taktik çelik yelekli, kaslı ve gözü kara. 'Bana bir şey olmaz!' deyip en riskli tuşlara dalar.",
+                        ModelAssetName = "SkelMesh_Bodyguard_02",
+                        PrefabAssetPath = "Assets/Characters/Prefabs/PlayerCharacter_Feg.prefab",
+                        PrimaryColor = new Color(0.90f, 0.25f, 0.25f),
+                        AccentColor = new Color(0.95f, 0.75f, 0.20f),
                         AvailableEmotes = new EmoteType[]
                         {
                             EmoteType.Kabadayi_ChestThump,
@@ -84,11 +98,14 @@ namespace FingerMonster.Player
                     return new CharacterDefinition
                     {
                         Archetype = CharacterArchetype.Korkak,
-                        DisplayName = "Tereddütlü Toni",
-                        Title = "Korkudan Titreyen",
-                        Description = "Kambur, pörtlek gözlü ve sürekli terleyen. Her tuşta ecel terleri döker.",
-                        PrimaryColor = new Color(0.2f, 0.55f, 0.9f),
-                        AccentColor = new Color(0.7f, 0.85f, 1.0f),
+                        DisplayName = "Kenan",
+                        PersonalityTag = "Ürkek",
+                        Title = "Panikleyen Protokol",
+                        Description = "Kusursuz takım elbiseli ama kulaklığındaki her sesten irkilen, tir tir titreyen pimpirikli ajan.",
+                        ModelAssetName = "SkelMesh_Bodyguard_01",
+                        PrefabAssetPath = "Assets/Characters/Prefabs/PlayerCharacter_Kenan.prefab",
+                        PrimaryColor = new Color(0.25f, 0.55f, 0.95f),
+                        AccentColor = new Color(0.70f, 0.85f, 1.00f),
                         AvailableEmotes = new EmoteType[]
                         {
                             EmoteType.Korkak_TrembleBite,
@@ -102,11 +119,14 @@ namespace FingerMonster.Player
                     return new CharacterDefinition
                     {
                         Archetype = CharacterArchetype.Sinsi,
-                        DisplayName = "Sinsi Salih",
-                        Title = "Tuzakların Efendisi",
-                        Description = "Sivri burunlu, kıvrak ve hesapçı. Başkalarının elleri koptuğunda kıkırdar.",
-                        PrimaryColor = new Color(0.25f, 0.75f, 0.35f),
-                        AccentColor = new Color(0.6f, 0.2f, 0.7f),
+                        DisplayName = "Feyzi",
+                        PersonalityTag = "Sinsi",
+                        Title = "Kurnaz Fedai",
+                        Description = "Kolları sıvalı gece kulübü fedaisi. Rakiplerinin eli koptuğunda kıs kıs gülen sinsi düzenbaz.",
+                        ModelAssetName = "SkelMesh_Bodyguard_03",
+                        PrefabAssetPath = "Assets/Characters/Prefabs/PlayerCharacter_Feyzi.prefab",
+                        PrimaryColor = new Color(0.25f, 0.80f, 0.35f),
+                        AccentColor = new Color(0.60f, 0.25f, 0.75f),
                         AvailableEmotes = new EmoteType[]
                         {
                             EmoteType.Sinsi_FingerWag,
@@ -121,11 +141,14 @@ namespace FingerMonster.Player
                     return new CharacterDefinition
                     {
                         Archetype = CharacterArchetype.Sovmen,
-                        DisplayName = "Şovmen Şinasi",
-                        Title = "Sahne Işıklarının Çocuğu",
-                        Description = "Silindir şapkalı, papyonlu ve abartılı. Ölürken bile son reveransını yapar.",
-                        PrimaryColor = new Color(0.95f, 0.65f, 0.15f),
-                        AccentColor = new Color(0.9f, 0.9f, 0.95f),
+                        DisplayName = "MMG",
+                        PersonalityTag = "Şovmen",
+                        Title = "VIP Şovmen",
+                        Description = "Her hamlesini podyum şovuna çeviren gösterişçi koruma. Elense bile son pozunu verir.",
+                        ModelAssetName = "SkelMesh_Bodyguard_04",
+                        PrefabAssetPath = "Assets/Characters/Prefabs/PlayerCharacter_MMG.prefab",
+                        PrimaryColor = new Color(0.95f, 0.70f, 0.15f),
+                        AccentColor = new Color(0.95f, 0.95f, 0.98f),
                         AvailableEmotes = new EmoteType[]
                         {
                             EmoteType.Sovmen_HatBow,

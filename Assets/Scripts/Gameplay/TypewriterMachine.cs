@@ -20,12 +20,15 @@ namespace FingerMonster.Gameplay
         public IReadOnlyList<TypewriterKey> Keys => keys;
 
         private Vector3 initialCarriagePos;
+        private Vector3 initialMachineLocalPos;
         private int carriageStep = 0;
         private const int MaxCarriageSteps = 10;
         private Coroutine carriageZipRoutine;
+        private Coroutine shakeRoutine;
 
         private void Awake()
         {
+            initialMachineLocalPos = transform.localPosition;
             if (carriageTransform != null)
             {
                 initialCarriagePos = carriageTransform.localPosition;
@@ -171,6 +174,64 @@ namespace FingerMonster.Gameplay
             {
                 paper.ClearPaper();
             }
+        }
+
+        /// <summary>
+        /// Tüm tuşlardaki Röntgen görsel vurgularını temizler.
+        /// </summary>
+        public void ClearAllXRayVisuals()
+        {
+            if (keys == null) return;
+            for (int i = 0; i < keys.Count; i++)
+            {
+                if (keys[i] != null)
+                {
+                    keys[i].ClearXRayVisual();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tüm tuşlardaki lanet görsel vurgularını temizler.
+        /// </summary>
+        public void ClearAllCurseVisuals()
+        {
+            if (keys == null) return;
+            for (int i = 0; i < keys.Count; i++)
+            {
+                if (keys[i] != null)
+                {
+                    keys[i].SetCursedVisual(false, false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Daktilo makinesini belirtilen süre ve şiddette titretir.
+        /// </summary>
+        public void ShakeMachine(float duration = 0.4f, float intensity = 0.018f)
+        {
+            if (shakeRoutine != null)
+            {
+                StopCoroutine(shakeRoutine);
+                transform.localPosition = initialMachineLocalPos;
+            }
+            shakeRoutine = StartCoroutine(ShakeMachineRoutine(duration, intensity));
+        }
+
+        private IEnumerator ShakeMachineRoutine(float duration, float intensity)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float damper = 1f - Mathf.Clamp01(elapsed / duration);
+                transform.localPosition = initialMachineLocalPos + Random.insideUnitSphere * (intensity * damper);
+                yield return null;
+            }
+
+            transform.localPosition = initialMachineLocalPos;
+            shakeRoutine = null;
         }
 
         public TypewriterKey GetKey(int index)

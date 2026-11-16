@@ -24,18 +24,62 @@ namespace FingerMonster.Gameplay
         [SerializeField] private RenderTexture reflectionTexture;
 
         private int butcherLayer = 10; // ButcherSecret layer
+        private int ghostOnlyLayer = 11; // GhostOnly layer
         private bool isExecutionActive = false;
+        public bool IsExecutionActive => isExecutionActive;
+        public bool IsLocalViewerGhost { get; set; } = false;
 
         private void Awake()
         {
             if (Instance != null && Instance != this)
             {
-                Destroy(gameObject);
-                return;
+                if (Instance.gameObject != gameObject)
+                {
+                    Destroy(Instance.gameObject);
+                }
+                else
+                {
+                    Destroy(this);
+                    return;
+                }
             }
             Instance = this;
 
+            ResolveGhostOnlyLayer();
             EnsureReflectionTexture();
+            ConfigureVisibility(false);
+        }
+
+        private void ResolveGhostOnlyLayer()
+        {
+            int namedLayer = LayerMask.NameToLayer("GhostOnly");
+            ghostOnlyLayer = namedLayer >= 0 ? namedLayer : 11;
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+            if (reflectionTexture != null)
+            {
+                if (reflectionCamera != null && reflectionCamera.targetTexture == reflectionTexture)
+                {
+                    reflectionCamera.targetTexture = null;
+                }
+                if (reflectionSurfaceRenderer != null && reflectionSurfaceRenderer.sharedMaterial != null)
+                {
+                    reflectionSurfaceRenderer.sharedMaterial.mainTexture = null;
+                }
+                reflectionTexture.Release();
+                if (Application.isPlaying)
+                {
+                    Destroy(reflectionTexture);
+                }
+                else
+                {
+                    DestroyImmediate(reflectionTexture);
+                }
+                reflectionTexture = null;
+            }
         }
 
         private void EnsureReflectionTexture()
@@ -69,8 +113,8 @@ namespace FingerMonster.Gameplay
         {
             isExecutionActive = true;
 
-            // 1. Odayı zifiri karanlığa büründür
-            if (RoomLightingController.Instance != null)
+            // 1. Odayı zifiri karanlığa büründür (hayalet izleyici normal ışıkta izler)
+            if (!IsLocalViewerGhost && RoomLightingController.Instance != null)
             {
                 RoomLightingController.Instance.SetExecutionMode(true);
             }
@@ -89,17 +133,40 @@ namespace FingerMonster.Gameplay
                 silhouetteRimLight.color = new Color(0.4f, 0.7f, 1.0f);
             }
 
-            // 3. Yansıma kamerasını aktifleştir
+            // 3. Yansıma kamerasını kurban koltuğuna doğrult ve aktifleştir
             if (reflectionCamera != null)
             {
+                reflectionCamera.cullingMask |= (1 << butcherLayer);
+                var seats = Object.FindObjectsByType<PlayerSeat>(FindObjectsSortMode.None);
+                for (int i = 0; i < seats.Length; i++)
+                {
+                    if (seats[i].PlayerIndex == victimSeatIndex)
+                    {
+                        Vector3 victimHead = seats[i].transform.position + Vector3.up * 1.25f;
+                        Vector3 seatDir = seats[i].transform.position;
+                        seatDir.y = 0f;
+                        Vector3 offsetDir = seatDir.sqrMagnitude > 0.001f ? seatDir.normalized : Vector3.forward;
+                        Vector3 camOrigin = new Vector3(0f, 1.35f, 0f) + offsetDir * -0.45f;
+                        reflectionCamera.transform.position = camOrigin;
+
+                        Vector3 lookDir = victimHead - camOrigin;
+                        if (lookDir.sqrMagnitude > 0.001f)
+                        {
+                            Vector3 forward = lookDir.normalized;
+                            Vector3 up = Mathf.Abs(Vector3.Dot(forward, Vector3.up)) > 0.95f ? Vector3.forward : Vector3.up;
+                            reflectionCamera.transform.rotation = Quaternion.LookRotation(forward, up);
+                        }
+                        break;
+                    }
+                }
                 reflectionCamera.enabled = true;
             }
 
             // 4. Görünürlük yönetimi: Seyirciler için kasap doğrudan görünmez, sadece yansımada belirir
             ConfigureVisibility(isLocalPlayerVictim);
 
-            // 5. Ses atmosferi: Seyirciler için boğuk/uzaktan yankılı ses
-            if (AudioManager.Instance != null)
+            // 5. Ses atmosferi: Seyirciler için boğuk/uzaktan yankılı ses (hayalet izleyici net duyar)
+            if (!IsLocalViewerGhost && AudioManager.Instance != null)
             {
                 AudioManager.Instance.SetExecutionAudioFilter(!isLocalPlayerVictim);
             }
@@ -107,21 +174,24 @@ namespace FingerMonster.Gameplay
             Debug.Log($"[ExecutionReflection] İnfaz başladı! Kurban Koltuğu: {victimSeatIndex}, Yerel Kurban mı: {isLocalPlayerVictim}");
         }
 
-        private void ConfigureVisibility(bool isLocalPlayerVictim)
+        public void ConfigureVisibility(bool isLocalPlayerVictim)
         {
             Camera mainCam = Camera.main;
             if (mainCam == null) return;
 
-            if (isLocalPlayerVictim)
+            ResolveGhostOnlyLayer();
+
+            // Kasap hiçbir zaman kameradan gizlenmez; tüm oyuncular tarafından doğrudan görünür.
+            mainCam.cullingMask |= (1 << butcherLayer);
+
+            // Hayaletlere özel önizleme katmanı yalnızca hayalet izleyicinin kamerasında görünür.
+            if (IsLocalViewerGhost)
             {
-                // Kurban: Önündeki daktilo yansımasında devasa silüeti görür, arkaya dönemez
-                mainCam.cullingMask |= (1 << butcherLayer);
+                mainCam.cullingMask |= (1 << ghostOnlyLayer);
             }
             else
             {
-                // Seyirci (Diğer Oyuncular): Kasabı doğrudan göremez (Culling Mask'tan çıkarılır),
-                // sadece daktilonun parlak yüzeyindeki silüet yansımasında görür!
-                mainCam.cullingMask &= ~(1 << butcherLayer);
+                mainCam.cullingMask &= ~(1 << ghostOnlyLayer);
             }
         }
 
@@ -146,6 +216,14 @@ namespace FingerMonster.Gameplay
             if (mainCam != null)
             {
                 mainCam.cullingMask |= (1 << butcherLayer);
+                if (IsLocalViewerGhost)
+                {
+                    mainCam.cullingMask |= (1 << ghostOnlyLayer);
+                }
+                else
+                {
+                    mainCam.cullingMask &= ~(1 << ghostOnlyLayer);
+                }
             }
 
             if (AudioManager.Instance != null)

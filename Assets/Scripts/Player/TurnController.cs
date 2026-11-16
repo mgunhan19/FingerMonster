@@ -12,29 +12,63 @@ namespace FingerMonster.Player
         public int ActivePlayerIndex { get; private set; } = 0;
 
         /// <summary>
-        /// Sırayı ilk oyuncuya sıfırlar.
+        /// Masa sıra dönüş yönü tersine çevrildi mi? (Ters Yön yetenek kartı etkisi)
+        /// </summary>
+        public bool IsReversed { get; private set; } = false;
+
+        /// <summary>
+        /// Sırayı ilk oyuncuya sıfırlar ve dönüş yönünü normale döndürür.
         /// </summary>
         public void ResetTurn(int startingIndex = 0)
         {
             ActivePlayerIndex = startingIndex;
+            IsReversed = false;
         }
 
         /// <summary>
-        /// Sıradaki hayatta olan oyuncuyu bulur ve sırayı ona geçirir.
+        /// Sıra dönüş yönünü doğrudan ayarlar.
+        /// </summary>
+        public void SetReversed(bool reversed) => IsReversed = reversed;
+
+        /// <summary>
+        /// Sıra dönüş yönünü tersine çevirir ve yeni yön durumunu döner.
+        /// </summary>
+        public bool ToggleDirection()
+        {
+            IsReversed = !IsReversed;
+            return IsReversed;
+        }
+
+        /// <summary>
+        /// Sıradaki hayatta olan oyuncuyu mevcut dönüş yönüne (IsReversed) göre bulur ve sırayı ona geçirir.
         /// Eğer hayatta oyuncu kalmadıysa veya tek kişi kaldıysa uygun dönüşü yapar.
         /// </summary>
         public int AdvanceToNextAlivePlayer(IReadOnlyList<PlayerData> players)
         {
+            int nextIndex = PeekNextAlivePlayer(players);
+            if (nextIndex >= 0)
+            {
+                ActivePlayerIndex = nextIndex;
+            }
+            return nextIndex;
+        }
+
+        /// <summary>
+        /// Sırayı değiştirmeden, mevcut dönüş yönüne (IsReversed) göre sıradaki hayatta olan oyuncunun indeksini döner.
+        /// </summary>
+        public int PeekNextAlivePlayer(IReadOnlyList<PlayerData> players)
+        {
             if (players == null || players.Count == 0) return -1;
 
             int total = players.Count;
+            int step = IsReversed ? -1 : 1;
+
             for (int i = 1; i <= total; i++)
             {
-                int candidate = (ActivePlayerIndex + i) % total;
+                int candidate = ((ActivePlayerIndex + step * i) % total + total) % total;
                 if (players[candidate].IsAlive)
                 {
-                    ActivePlayerIndex = candidate;
-                    return ActivePlayerIndex;
+                    return candidate;
                 }
             }
 

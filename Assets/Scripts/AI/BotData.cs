@@ -1,16 +1,18 @@
 using System;
 using UnityEngine;
+using FingerMonster.Player;
 
 namespace FingerMonster.AI
 {
     /// <summary>
-    /// Botun çizgi film tarzı kişilik türü. Aşama 3'te animasyon ve ses tepkilerini de belirler.
+    /// Botun çizgi film tarzı kişilik türü. Karakter kişilikleriyle birebir eşleşir.
     /// </summary>
     public enum BotPersonality
     {
-        Cesur,  // Cesur: Hızlı karar verir (0.8-1.5s), risk almaktan çekinmez
-        Urkek,  // Ürkek: Tereddütlüdür (2.0-3.2s), kenar tuşları tercih eder, titrer
-        Sinsi   // Sinsi: Olasılıkları tartar (1.4-2.2s), rakiplerin durumuna göre stratejik bekler
+        Cesur,  // Feg: Hızlı karar verir (1.0-1.6s), risk almaktan çekinmez
+        Urkek,  // Kenan: Tereddütlüdür (2.0-3.0s), kenar tuşları tercih eder, titrer
+        Sinsi,  // Feyzi: Olasılıkları tartar (1.4-2.3s), stratejik bekler
+        Sovmen  // MMG: Gösterişçi ve teatral (1.1-1.9s), şov amaçlı tuş seçer
     }
 
     /// <summary>
@@ -35,34 +37,49 @@ namespace FingerMonster.AI
         public BotDifficulty Difficulty;
         public Color AvatarColor;
 
-        public static BotProfile GenerateRandom(int slotIndex, BotDifficulty diff = BotDifficulty.Normal)
+        public static BotPersonality MapArchetypeToPersonality(CharacterArchetype archetype)
         {
-            string[] names = new string[] { "Demir Parmak", "Tereddütlü Toni", "Korkusuz Kaan", "Şanslı Sam", "Gölge Gizem", "Daktilo Dede" };
-            BotPersonality[] personalities = (BotPersonality[])Enum.GetValues(typeof(BotPersonality));
+            switch (archetype)
+            {
+                case CharacterArchetype.Kabadayi: return BotPersonality.Cesur;
+                case CharacterArchetype.Korkak: return BotPersonality.Urkek;
+                case CharacterArchetype.Sinsi: return BotPersonality.Sinsi;
+                case CharacterArchetype.Sovmen:
+                default: return BotPersonality.Sovmen;
+            }
+        }
 
-            string name = names[slotIndex % names.Length];
-            BotPersonality pers = personalities[UnityEngine.Random.Range(0, personalities.Length)];
+        public static string GetPersonalityLabel(BotPersonality personality)
+        {
+            switch (personality)
+            {
+                case BotPersonality.Cesur: return "Cesur";
+                case BotPersonality.Urkek: return "Ürkek";
+                case BotPersonality.Sinsi: return "Sinsi";
+                case BotPersonality.Sovmen:
+                default: return "Şovmen";
+            }
+        }
+
+        public static BotProfile ForCharacterSlot(int slotIndex, CharacterArchetype archetype, BotDifficulty diff = BotDifficulty.Normal)
+        {
+            var def = CharacterDefinition.GetDefinition(archetype);
+            BotPersonality pers = MapArchetypeToPersonality(archetype);
 
             return new BotProfile
             {
                 SlotIndex = slotIndex,
-                BotName = $"{name} ({pers})",
+                BotName = $"{def.DisplayName} ({def.PersonalityTag})",
                 Personality = pers,
                 Difficulty = diff,
-                AvatarColor = GetDefaultSlotColor(slotIndex)
+                AvatarColor = def.PrimaryColor
             };
         }
 
-        private static Color GetDefaultSlotColor(int slot)
+        public static BotProfile GenerateRandom(int slotIndex, BotDifficulty diff = BotDifficulty.Normal)
         {
-            switch (slot)
-            {
-                case 0: return new Color(0.9f, 0.25f, 0.25f);
-                case 1: return new Color(0.25f, 0.55f, 0.95f);
-                case 2: return new Color(0.25f, 0.85f, 0.35f);
-                case 3: return new Color(0.95f, 0.75f, 0.2f);
-                default: return Color.gray;
-            }
+            CharacterArchetype archetype = (CharacterArchetype)(Mathf.Abs(slotIndex) % 4);
+            return ForCharacterSlot(slotIndex, archetype, diff);
         }
     }
 }

@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82941efa032df5c4bb4ff98c42078530, type: 3}
+  m_Name: EmoteData_Feyzi
+  m_EditorClassIdentifier: Assembly-CSharp::FingerMonster.Player.CharacterEmoteData
+  Archetype: 2
+  CharacterName: Feyzi
+  PersonalityTag: Sinsi
+  Slots:
+  - SlotNumber: 1
+    DisplayName: "Yava\u015F Alk\u0131\u015F"
+    PopupText: "\u015EAK... \u015EAK..."
+    PopupColor: {r: 0.4, g: 0.95, b: 0.55, a: 1}
+    ExpectedMixamoFile: Emote1_Feyzi.fbx
+    RecommendedMixamoSearch: Sitting Clap / Slow Clap
+    Description: "Rakibi sinir etmek i\xE7in yava\u015F\xE7a alk\u0131\u015Flar."
+  - SlotNumber: 2
+    DisplayName: "C\u0131k C\u0131k Sitem"
+    PopupText: CIK CIK CIK...
+    PopupColor: {r: 0.7, g: 0.4, b: 0.95, a: 1}
+    ExpectedMixamoFile: Emote2_Feyzi.fbx
+    RecommendedMixamoSearch: Sitting Disapproval / Finger Wag
+    Description: "Kurnazca ba\u015F\u0131n\u0131 sallay\u0131p onaylamaz."
+  - SlotNumber: 3
+    DisplayName: "Hedef \u0130\u015Fareti"
+    PopupText: "TUZAK SEN\u0130N!"
+    PopupColor: {r: 0, g: 1, b: 0, a: 1}
+    ExpectedMixamoFile: Emote3_Feyzi.fbx
+    RecommendedMixamoSearch: Pointing / Sneaky Point
+    Description: "Sinsi bir s\u0131r\u0131t\u0131\u015Fla rakibi g\xF6sterir."
+  - SlotNumber: 4
+    DisplayName: Sinsi Alay
+    PopupText: "\xC7OK ZAYIFSIN!"
+    PopupColor: {r: 0.85, g: 0.35, b: 0.95, a: 1}
+    ExpectedMixamoFile: Emote4_Feyzi.fbx
+    RecommendedMixamoSearch: Taunt Gesture / Mock
+    Description: "Rakibi k\u0131\u015Fk\u0131rtan el hareketi yapar."
+  - SlotNumber: 5
+    DisplayName: "K\u0131s K\u0131s G\xFCl\xFC\u015F"
+    PopupText: HIHIHI...
+    PopupColor: {r: 0.35, g: 0.9, b: 0.45, a: 1}
+    ExpectedMixamoFile: Emote5_Feyzi.fbx
+    RecommendedMixamoSearch: Sitting Laughing / Evil Laugh
+    Description: "Rakip zorlan\u0131nca k\u0131s k\u0131s g\xFCler."

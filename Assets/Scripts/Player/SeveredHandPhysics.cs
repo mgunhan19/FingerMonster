@@ -12,16 +12,16 @@ namespace FingerMonster.Player
     public class SeveredHandPhysics : MonoBehaviour
     {
         [Header("Fizik Ayarları")]
-        [SerializeField] private float launchUpwardForce = 5.5f;
-        [SerializeField] private float launchHorizontalForce = 3.0f;
-        [SerializeField] private float tumbleTorque = 16.0f;
-        [SerializeField] private float twitchDuration = 5.0f;
+        [SerializeField] private float launchUpwardForce = 2.0f;
+        [SerializeField] private float launchHorizontalForce = 1.5f;
+        [SerializeField] private float tumbleTorque = 6.5f;
+        [SerializeField] private float twitchDuration = 4.0f;
 
         private Rigidbody rb;
         private Collider col;
         private bool hasLanded = false;
         private Coroutine twitchRoutine;
-        private Color handColor = Color.white;
+        private Color handColor = new Color(0.32f, 0.015f, 0.015f);
 
         private void Awake()
         {
@@ -32,7 +32,8 @@ namespace FingerMonster.Player
             if (col == null)
             {
                 BoxCollider box = gameObject.AddComponent<BoxCollider>();
-                box.size = new Vector3(0.25f, 0.2f, 0.35f);
+                box.size = new Vector3(0.14f, 0.08f, 0.20f);
+                col = box;
             }
 
             rb.mass = 0.8f;
@@ -45,11 +46,11 @@ namespace FingerMonster.Player
         }
 
         /// <summary>
-        /// Eli belirtilen yön ve renkle havaya fırlatır.
+        /// Eli belirtilen yönde gerçekçi kesik el ağırlığıyla fırlatır.
         /// </summary>
         public void Launch(Vector3 launchDirection, Color playerColor)
         {
-            handColor = playerColor;
+            handColor = new Color(0.32f, 0.015f, 0.015f);
             transform.SetParent(null, true);
 
             if (col != null) col.enabled = true;
@@ -58,7 +59,9 @@ namespace FingerMonster.Player
                 rb.isKinematic = false;
                 rb.useGravity = true;
 
-                Vector3 impulse = Vector3.up * launchUpwardForce + launchDirection.normalized * launchHorizontalForce;
+                float effectiveUpForce = Mathf.Min(launchUpwardForce, 2.0f);
+                float effectiveHorizForce = Mathf.Min(launchHorizontalForce, 1.5f);
+                Vector3 impulse = Vector3.up * effectiveUpForce + launchDirection.normalized * effectiveHorizForce;
                 rb.AddForce(impulse, ForceMode.Impulse);
 
                 Vector3 torque = new Vector3(
@@ -69,16 +72,14 @@ namespace FingerMonster.Player
                 rb.AddTorque(torque, ForceMode.Impulse);
             }
 
-            // Çizgi film yay fırlama ve şaplak sesi
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayTrapSting();
             }
 
-            // Çizgi film puf dumanı ve boya sıçraması
             if (CartoonFXManager.Instance != null)
             {
-                CartoonFXManager.Instance.PlayTrapSnapFX(transform.position, playerColor);
+                CartoonFXManager.Instance.PlayTrapSnapFX(transform.position, handColor);
             }
 
             // 1.2 saniye sonra düşüş garantisiyle seğirmeye başla
@@ -90,10 +91,10 @@ namespace FingerMonster.Player
             if (hasLanded) return;
             hasLanded = true;
 
-            // Küçük çizgi film "şop" etkisi
             if (CartoonFXManager.Instance != null)
             {
-                CartoonFXManager.Instance.SpawnComicPopup(transform.position + Vector3.up * 0.2f, "ŞOP!", Color.yellow);
+                Vector3 splatPoint = (collision.contactCount > 0) ? collision.GetContact(0).point : transform.position;
+                CartoonFXManager.Instance.SpawnPaintSplat(splatPoint, new Color(0.32f, 0.015f, 0.015f));
             }
 
             if (twitchRoutine != null) StopCoroutine(twitchRoutine);
@@ -112,7 +113,7 @@ namespace FingerMonster.Player
         }
 
         /// <summary>
-        /// Yerde komik bir şekilde parmaklarıyla seğiren el hareketi (Looney Tunes tarzı).
+        /// Yerde gerçekçi, hafif sinir seğirmesi.
         /// </summary>
         private IEnumerator TwitchOnFloorRoutine()
         {
@@ -123,27 +124,19 @@ namespace FingerMonster.Player
             {
                 elapsed += Time.deltaTime;
 
-                // Ritmik seğirme ve minik zıplamalar
-                float twitchFactor = Mathf.Sin(elapsed * 24f);
-                if (twitchFactor > 0.85f && rb != null)
+                float twitchFactor = Mathf.Sin(elapsed * 20f);
+                if (twitchFactor > 0.90f && rb != null)
                 {
-                    rb.AddForce(Vector3.up * 0.8f + Random.insideUnitSphere * 0.3f, ForceMode.Impulse);
-                    rb.AddTorque(Random.insideUnitSphere * 1.5f, ForceMode.Impulse);
+                    rb.AddForce(Random.insideUnitSphere * 0.15f, ForceMode.Impulse);
+                    rb.AddTorque(Random.insideUnitSphere * 0.45f, ForceMode.Impulse);
                 }
 
-                // Squash & stretch deformasyonu
-                float scaleSquash = 1f + Mathf.Sin(elapsed * 18f) * 0.12f;
-                transform.localScale = new Vector3(baseScale.x * scaleSquash, baseScale.y / scaleSquash, baseScale.z * scaleSquash);
+                transform.localScale = baseScale;
 
                 yield return null;
             }
 
-            // Seğirme bitince el komik bir dumanla puf diye kaybolur
-            if (CartoonFXManager.Instance != null)
-            {
-                CartoonFXManager.Instance.PlayConfetti(transform.position, handColor);
-            }
-            gameObject.SetActive(false);
+            transform.localScale = baseScale;
         }
 
         /// <summary>
